@@ -64,21 +64,6 @@ export default function EasyConstructLanding() {
 
   return (
     <>
-      {/* Header with Login button */}
-      <header className="w-full py-4 px-6 flex items-center justify-between bg-transparent">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold">EasyConstruct</h1>
-        </div>
-
-        <div>
-          <Link
-            href="/login"
-            className="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition"
-          >
-            Login
-          </Link>
-        </div>
-      </header>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/modern-construction-site-with-cranes-and-blueprint.jpg')] bg-cover bg-center opacity-20 dark:opacity-10" />

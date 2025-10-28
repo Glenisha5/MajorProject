@@ -49,6 +49,8 @@ export default function EasyConstructLanding() {
   const [animationStep, setAnimationStep] = useState(0)
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -57,6 +59,52 @@ export default function EasyConstructLanding() {
     }, 3000)
     return () => clearInterval(interval)
   }, [])
+
+  async function handleLogin() {
+    setLoading(true)
+    setError("")
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data?.error || "Login failed")
+      } else {
+        setIsAuthenticated(true)
+        setPassword("")
+      }
+    } catch (e) {
+      setError("Network error")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleSignup() {
+    setLoading(true)
+    setError("")
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data?.error || "Signup failed")
+      } else {
+        setIsAuthenticated(true)
+        setPassword("")
+      }
+    } catch (e) {
+      setError("Network error")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (isAuthenticated) {
     return <BudgetInputScreen />
@@ -72,10 +120,10 @@ export default function EasyConstructLanding() {
 
         <div>
           <Link
-            href="/login"
+            href="#get-started"
             className="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition"
           >
-            Login
+            Get Started
           </Link>
         </div>
       </header>
@@ -209,7 +257,7 @@ export default function EasyConstructLanding() {
           </div>
 
           {/* Authentication Section */}
-          <div className="max-w-md mx-auto">
+          <div id="get-started" className="max-w-md mx-auto">
             <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-0 shadow-2xl">
               <CardHeader className="text-center pb-4">
                 <CardTitle className="text-2xl font-bold text-slate-800 dark:text-white">Get Started</CardTitle>
@@ -223,6 +271,7 @@ export default function EasyConstructLanding() {
                     <TabsTrigger value="login">Login</TabsTrigger>
                     <TabsTrigger value="signup">Sign Up</TabsTrigger>
                   </TabsList>
+                  {error && <div className="text-sm text-red-600 text-center">{error}</div>}
 
                   <TabsContent value="login" className="space-y-4">
                     <div className="space-y-2">
@@ -252,11 +301,16 @@ export default function EasyConstructLanding() {
                       />
                     </div>
                     <Button
-                      onClick={() => setIsAuthenticated(true)}
+                      onClick={handleLogin}
+                      disabled={loading}
                       className="w-full !bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
                     >
-                      Login to EasyConstruct
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      {loading ? 'Signing in...' : (
+                        <>
+                          Login to EasyConstruct
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </>
+                      )}
                     </Button>
                   </TabsContent>
 
@@ -301,11 +355,16 @@ export default function EasyConstructLanding() {
                       />
                     </div>
                     <Button
-                      onClick={() => setIsAuthenticated(true)}
+                      onClick={handleSignup}
+                      disabled={loading}
                       className="w-full !bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
                     >
-                      Create Account
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      {loading ? 'Creating account...' : (
+                        <>
+                          Create Account
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </>
+                      )}
                     </Button>
                   </TabsContent>
                 </Tabs>

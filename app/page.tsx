@@ -40,6 +40,7 @@ import MaterialsDirectory from "@/components/MaterialsDirectory"
 import WorkforceDirectory from "@/components/WorkforceDirectory"
 import VastuEcoCompliance from "@/components/VastuEcoCompliance"
 import AIConstructionChatbot from "@/components/AIConstructionChatbot"
+import DIYCard from "@/components/Diy_yt/components/DIYCard"
 
 export default function EasyConstructLanding() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -112,21 +113,6 @@ export default function EasyConstructLanding() {
 
   return (
     <>
-      {/* Header with Login button */}
-      <header className="w-full py-4 px-6 flex items-center justify-between bg-transparent">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold">EasyConstruct</h1>
-        </div>
-
-        <div>
-          <Link
-            href="#get-started"
-            className="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition"
-          >
-            Get Started
-          </Link>
-        </div>
-      </header>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/modern-construction-site-with-cranes-and-blueprint.jpg')] bg-cover bg-center opacity-20 dark:opacity-10" />
@@ -400,7 +386,7 @@ export default function EasyConstructLanding() {
               ))}
             </div>
             <p className="text-slate-800 dark:text-slate-200 text-lg font-medium">
-              AI-powered construction across Mumbai, Delhi, Bangalore, Chennai & 200+ cities
+              AI-powered construction across Mangalore, Mumbai, Delhi, Bangalore, Chennai & 200+ cities
             </p>
             <div className="mt-8 flex justify-center">
               <footer className="w-full text-center mt-4">
@@ -444,7 +430,12 @@ function BudgetInputScreen() {
   const [constructionType, setConstructionType] = useState("")
   const [qualityLevel, setQualityLevel] = useState("")
   const [floors, setFloors] = useState("")
-  const [plotSize, setplotSize] = useState("")
+  const [plotSize, setPlotSize] = useState("") // plot size in sqft as string
+
+  // add: compute numeric sqft and convert to cents (1 cent ≈ 435.6 sqft)
+  const plotSizeSqft = parseFloat(plotSize) || 0
+  const plotSizeCents = plotSizeSqft ? +(plotSizeSqft / 435.6).toFixed(2) : 0
+
   const [showAnalysis, setShowAnalysis] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
 
@@ -821,6 +812,8 @@ function BudgetInputScreen() {
         { name: "Hubli", multiplier: 0.8, avgCost: 1600 },
         { name: "Mangalore", multiplier: 0.9, avgCost: 1800 },
         { name: "Belgaum", multiplier: 0.8, avgCost: 1600 },
+        { name: "Manipal", multiplier: 0.9, avgCost: 2000 },
+        { name: "Bramhavara", multiplier: 0.8, avgCost: 1600 },
       ],
     },
     Kerala: {
@@ -1510,7 +1503,7 @@ function BudgetInputScreen() {
           </div>
           <h2 className="text-3xl font-bold text-balance mb-2">Smart Budget & Project Planner</h2>
           <p className="text-muted-foreground text-pretty">
-            Get AI-powered cost estimates with real-time regional pricing across India
+            Get AI-powered Budget Estimation  with real-time regional pricing across India
           </p>
         </div>
 
@@ -1522,7 +1515,7 @@ function BudgetInputScreen() {
                 <Calculator className="h-5 w-5" />
                 Project Details
               </CardTitle>
-              <CardDescription>Enter comprehensive details for accurate cost estimation</CardDescription>
+              <CardDescription>Enter comprehensive details for accurate Budget estimation</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -1618,14 +1611,19 @@ function BudgetInputScreen() {
                 {/* Plot and Construction Details */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="plotSize">Plot Size (sq ft)</Label>
+                    <Label htmlFor="plotSize">Plot Size</Label>
                     <Input
                       id="plotSize"
                       placeholder="e.g., 2400"
                       value={plotSize}
-                      onChange={(e) => setplotSize(e.target.value)}
+                      onChange={(e) => setPlotSize(e.target.value)}
                       required
                     />
+                    {plotSizeSqft > 0 && (
+                      <div className="text-xs text-muted-foreground">
+                        = {plotSizeSqft.toLocaleString()} sq ft ≈ {plotSizeCents} cents
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="floors">Number of Floors</Label>
@@ -1904,71 +1902,108 @@ function ConstructionDashboard() {
     return <VastuEcoCompliance onBack={() => setCurrentView("dashboard")} />
   }
 
+  // new: diy view branch
+  if (currentView === "diy") {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card/95 backdrop-blur-md sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                <Building2 className="h-5 w-5" />
+              </div>
+              <span className="font-semibold">EasyConstruct — DIY Projects</span>
+            </div>
+            {mounted && (
+              <Button variant="outline" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            )}
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-8">
+          <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className="mb-4">
+            ← Back to Dashboard
+          </Button>
+
+          {/* render DIYCard (entry for the embedded Diy_yt mini-app) */}
+          <DIYCard />
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card/95 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-white" />
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                <Building2 className="h-5 w-5" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold">EasyConstruct</h1>
-                <p className="text-xs text-muted-foreground">AI Construction Platform</p>
-              </div>
+              <span className="font-semibold">EasyConstruct</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <nav className="hidden md:flex items-center gap-2">
-                <Button
-                  variant={currentView === "dashboard" ? "default" : "ghost"}
-                  onClick={() => setCurrentView("dashboard")}
-                  className="gap-2"
-                >
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </Button>
-                <Button
-                  variant={currentView === "ai-designer" ? "default" : "ghost"}
-                  onClick={() => setCurrentView("ai-designer")}
-                  className="gap-2"
-                >
-                  <Bot className="h-4 w-4" />
-                  AI Designer
-                </Button>
-                <Button
-                  variant={currentView === "materials" ? "default" : "ghost"}
-                  onClick={() => setCurrentView("materials")}
-                  className="gap-2"
-                >
-                  <Cpu className="h-4 w-4" />
-                  AI Materials
-                </Button>
-                <Button
-                  variant={currentView === "workforce" ? "default" : "ghost"}
-                  onClick={() => setCurrentView("workforce")}
-                  className="gap-2"
-                >
-                  <Users className="h-4 w-4" />
-                  AI Workforce
-                </Button>
-                <Button
-                  variant={currentView === "vastu" ? "default" : "ghost"}
-                  onClick={() => setCurrentView("vastu")}
-                  className="gap-2"
-                >
-                  <Leaf className="h-4 w-4" />
-                  AI Vastu & Eco
-                </Button>
-              </nav>
+            <nav className="flex items-center gap-2">
+              <Button
+                variant={currentView === "dashboard" ? "default" : "ghost"}
+                onClick={() => setCurrentView("dashboard")}
+                className="gap-2"
+              >
+                <Home className="h-4 w-4" />
+                Dashboard
+              </Button>
+              <Button
+                variant={currentView === "ai-designer" ? "default" : "ghost"}
+                onClick={() => setCurrentView("ai-designer")}
+                className="gap-2"
+              >
+                <Bot className="h-4 w-4" />
+                AI Designer
+              </Button>
+              <Button
+                variant={currentView === "materials" ? "default" : "ghost"}
+                onClick={() => setCurrentView("materials")}
+                className="gap-2"
+              >
+                <Cpu className="h-4 w-4" />
+                AI Materials
+              </Button>
+              <Button
+                variant={currentView === "workforce" ? "default" : "ghost"}
+                onClick={() => setCurrentView("workforce")}
+                className="gap-2"
+              >
+                <Users className="h-4 w-4" />
+                AI Workforce
+              </Button>
+              <Button
+                variant={currentView === "vastu" ? "default" : "ghost"}
+                onClick={() => setCurrentView("vastu")}
+                className="gap-2"
+              >
+                <Leaf className="h-4 w-4" />
+                AI Vastu & Eco
+              </Button>
 
-              {mounted && (
-                <Button variant="outline" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-                  {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                </Button>
-              )}
-            </div>
+              {/* new nav button to open the DIY mini-app */}
+              <Button
+                variant={currentView === "diy" ? "default" : "ghost"}
+                onClick={() => setCurrentView("diy")}
+                className="gap-2"
+              >
+                <Star className="h-4 w-4" />
+                DIY Projects
+              </Button>
+            </nav>
+
+            {mounted && (
+              <Button variant="outline" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            )}
           </div>
         </div>
       </header>

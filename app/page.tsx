@@ -34,6 +34,10 @@ import {
   Moon,
   Bot,
   Cpu,
+  ComputerIcon,
+  CarTaxiFront,
+  MapIcon,
+  PersonStanding,
 } from "lucide-react"
 import AIHouseDesigner from "@/components/AIHouseDesigner"
 import MaterialsDirectory from "@/components/MaterialsDirectory"
@@ -41,6 +45,13 @@ import WorkforceDirectory from "@/components/WorkforceDirectory"
 import VastuEcoCompliance from "@/components/VastuEcoCompliance"
 import AIConstructionChatbot from "@/components/AIConstructionChatbot"
 import DIYCard from "@/components/Diy_yt/components/DIYCard"
+import { map } from "lodash"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
 
 export default function EasyConstructLanding() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -194,9 +205,16 @@ export default function EasyConstructLanding() {
               {
                 icon: Bot,
                 title: "AI House Designer",
-                desc: "3D visualization & AR/VR",
+                desc: "Sketch Generation & Furniture AR/VR",
                 color: "from-blue-500 to-cyan-500",
                 aiFeature: "Smart Design Generation",
+              },
+              {
+                icon:ComputerIcon,
+                title: "AI ChatBot",
+                desc: "Multi-lingual",
+                color: "from-blue-500 to-cyan-500",
+                aiFeature: "AI Chatbot Assistant",
               },
               {
                 icon: Cpu,
@@ -211,6 +229,27 @@ export default function EasyConstructLanding() {
                 desc: "Verified contractors & labor",
                 color: "from-green-500 to-emerald-500",
                 aiFeature: "Smart Matching",
+              },
+              {
+                icon: CarTaxiFront,
+                title: "budget estimation",
+                desc: "smart cost Prediction",
+                color: "from-purple-500 to-pink-500",
+                aiFeature: "AI-powered cost prediction",
+              },
+              {
+                icon: MapIcon,
+                title: "Mapping",
+                desc: "displays nearby construction related shops",
+                color: "from-purple-500 to-pink-500",
+                aiFeature: "Smart map recommendations",
+              },
+              {
+                icon: PersonStanding,
+                title: "AI Contractor Review",
+                desc: "Sustainable & compliant",
+                color: "from-purple-500 to-pink-500",
+                aiFeature: "AI Review",
               },
               {
                 icon: Leaf,
@@ -1955,14 +1994,42 @@ function ConstructionDashboard() {
                 <Home className="h-4 w-4" />
                 Dashboard
               </Button>
-              <Button
-                variant={currentView === "ai-designer" ? "default" : "ghost"}
-                onClick={() => setCurrentView("ai-designer")}
-                className="gap-2"
-              >
-                <Bot className="h-4 w-4" />
-                AI Designer
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant={currentView === "ai-designer" ? "default" : "ghost"}
+                    className="gap-2"
+                  >
+                    <Bot className="h-4 w-4" />
+                    AI Designer
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      setCurrentView("ai-designer")
+                    }}
+                  >
+                    Open AI Designer (In-app)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      // open the standalone frontend (if you run that app separately)
+                      window.open("/ai-house-project/frontend/index.html", "_blank")
+                    }}
+                  >
+                    Open AI House Project (External)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      // open the AR/VR demo in a new tab
+                      window.open("/AR-vr/visionary-home-forge/index.html", "_blank")
+                    }}
+                  >
+                    Open AR-VR (External)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant={currentView === "materials" ? "default" : "ghost"}
                 onClick={() => setCurrentView("materials")}

@@ -169,23 +169,55 @@ export default function AIConstructionChatbot() {
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const currentMessage = inputMessage
     setInputMessage("")
     setIsTyping(true)
 
-    // Simulate AI processing delay
-    setTimeout(() => {
-      const aiResponse = getAIResponse(inputMessage, userLanguage)
+    try {
+      // Call the Flask backend API
+      const response = await fetch("http://localhost:5000/api/chatbot/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: currentMessage,
+          language: selectedLanguage,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "ai",
-        content: aiResponse,
+        content: data.reply || "Sorry, I couldn't process your request.",
         timestamp: new Date(),
-        language: userLanguage,
+        language: data.detected_language || userLanguage,
       }
 
       setMessages((prev) => [...prev, aiMessage])
+    } catch (error) {
+      console.error("Error communicating with AI backend:", error)
+      
+      // Fallback to local response if API fails
+      const fallbackResponse = getAIResponse(currentMessage, userLanguage)
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "ai",
+        content: fallbackResponse + "\n\n⚠️ Note: Using offline mode. For better AI responses, ensure the backend server is running.",
+        timestamp: new Date(),
+        language: userLanguage,
+      }
+      
+      setMessages((prev) => [...prev, aiMessage])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const handleQuickAction = (query: string) => {

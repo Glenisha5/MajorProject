@@ -1,5 +1,0 @@
-{
-  "name": "DIY Universe",
-  "description": "A web application that helps users find DIY video ideas on topics like home decor, construction, and repairs. Users can search for a topic, and the app generates relevant project ideas. Each idea links directly to a YouTube search for corresponding video tutorials.",
-  "requestFramePermissions": []
-}

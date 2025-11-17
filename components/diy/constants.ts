@@ -1,4 +1,3 @@
-
 import { DIYTopic } from './types';
 
 export const INITIAL_DIY_TOPICS: DIYTopic[] = [
@@ -10,7 +9,6 @@ export const INITIAL_DIY_TOPICS: DIYTopic[] = [
     title: "Fix a Leaky Faucet",
     description: "Learn the basic plumbing steps to fix a common dripping faucet and save water and money."
   },
-
   {
     title: "Paint a Room Like a Pro",
     description: "Master the techniques for clean lines, even coats, and a professional finish when painting any room."

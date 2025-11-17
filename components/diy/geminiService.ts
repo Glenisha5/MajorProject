@@ -1,17 +1,29 @@
+import { DIYTopic } from "./types";
 
-import { GoogleGenAI, Type } from "@google/genai";
-import { DIYTopic } from "../types";
+// Note: This service requires Google Generative AI library
+// Install it with: npm install @google/genai
 
-const API_KEY = process.env.API_KEY;
+let GoogleGenAI: any;
+let Type: any;
 
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable is not set");
+try {
+  const genai = require("@google/genai");
+  GoogleGenAI = genai.GoogleGenAI;
+  Type = genai.Type;
+} catch (error) {
+  console.warn("@google/genai not installed. AI-powered search will be disabled.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
 export async function generateDIYTopics(query: string): Promise<DIYTopic[]> {
+  if (!GoogleGenAI || !API_KEY) {
+    throw new Error("Gemini API is not configured. Please add NEXT_PUBLIC_GEMINI_API_KEY to your environment variables.");
+  }
+
   try {
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `Generate a list of 8 specific and actionable DIY project ideas related to "${query}". Focus on construction, home improvement, decor, and repair tasks. For each idea, provide a short, engaging one-sentence description.`,

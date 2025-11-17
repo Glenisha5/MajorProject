@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import AIConstructionChatbot from "@/components/AIConstructionChatbot"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
             {children}
+            <AIConstructionChatbot />
           </ThemeProvider>
           <Analytics />
         </Suspense>

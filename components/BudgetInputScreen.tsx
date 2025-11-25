@@ -1,424 +1,50 @@
 "use client"
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
-import { useTheme } from "next-themes"
-import {
-  Building2,
-  Hammer,
-  Home,
-  Palette,
-  Users,
-  Zap,
-  Shield,
-  Leaf,
-  MapPin,
-  Calculator,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Sparkles,
-  ArrowRight,
-  Star,
-  Award,
-  Globe,
-  Sun,
-  Moon,
-  Bot,
-  Cpu,
-} from "lucide-react"
-import AIHouseDesigner from "@/components/AIHouseDesigner"
-import MaterialsDirectory from "@/components/MaterialsDirectory"
-import WorkforceDirectory from "@/components/WorkforceDirectory"
-import VastuEcoCompliance from "@/components/VastuEcoCompliance"
-import AIConstructionChatbot from "@/components/AIConstructionChatbot"
-import DIYUniverse from "@/components/diy/DIYUniverse"
+import { Building2, Calculator, TrendingUp, AlertTriangle, CheckCircle, MapPin } from "lucide-react"
 
-export default function EasyConstructLanding() {
-  const router = useRouter()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [name, setName] = useState("")
-  const [animationStep, setAnimationStep] = useState(0)
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-    const interval = setInterval(() => {
-      setAnimationStep((prev) => (prev + 1) % 4)
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
-
-  async function handleLogin() {
-    setLoading(true)
-    setError("")
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data?.error || "Login failed")
-      } else {
-        // Redirect to dashboard instead of showing form
-        router.push("/dashboard")
-      }
-    } catch (e) {
-      setError("Network error")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function handleSignup() {
-    setLoading(true)
-    setError("")
-    try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data?.error || "Signup failed")
-      } else {
-        // Redirect to dashboard instead of showing form
-        router.push("/dashboard")
-      }
-    } catch (e) {
-      setError("Network error")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (isAuthenticated) {
-    return <BudgetInputScreen />
-  }
-
-  return (
-    <>
-
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/modern-construction-site-with-cranes-and-blueprint.jpg')] bg-cover bg-center opacity-20 dark:opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-cyan-600/30 dark:from-blue-800/40 dark:to-cyan-800/40" />
-
-        {/* Floating particles animation */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white/20 dark:bg-white/10 rounded-full animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="relative z-10 container mx-auto px-4 py-8">
-          <header className="flex items-center justify-between mb-12">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white">EasyConstruct</h1>
-                <p className="text-sm text-blue-200 dark:text-blue-300">AI-Powered Construction Website</p>
-              </div>
-            </div>
-
-            {mounted && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="bg-white/10 border-white/20 hover:bg-white/20 text-white"
-              >
-                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-            )}
-          </header>
-
-          {/* Hero Section */}
-          <div className="text-center mb-16 space-y-8">
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full px-6 py-2 mb-6">
-                <Sparkles className="h-4 w-4 text-blue-300 animate-pulse" />
-                <span className="text-blue-200 font-medium">AI Construction Platform</span>
-                <Sparkles className="h-4 w-4 text-cyan-300 animate-pulse" />
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold text-white text-balance leading-tight">
-                Build Your{" "}
-                <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent animate-pulse">
-                  Dream Home
-                </span>{" "}
-                with AI
-              </h1>
-            </div>
-            <div className="space-y-4">
-              <p className="text-2xl text-white text-balance max-w-3xl mx-auto font-medium">
-                Your One Stop-Shop for Construction
-              </p>
-              <p className="text-lg text-slate-200 dark:text-slate-300 text-pretty max-w-2xl mx-auto">
-                Check, Compare, Conclude your dream home with cutting-edge AI technology
-              </p>
-              <div className="flex items-center justify-center gap-2 mt-6">
-                <Star className="h-5 w-5 text-yellow-400 fill-current animate-pulse" />
-                <span className="text-white">Trusted by builders across India</span>
-                <Star className="h-5 w-5 text-yellow-400 fill-current animate-pulse" />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6 mb-16">
-            {[
-              {
-                icon: Bot,
-                title: "AI House Designer",
-                desc: "3D visualization & AR/VR",
-                color: "from-blue-500 to-cyan-500",
-                aiFeature: "Smart Design Generation",
-              },
-              {
-                icon: Cpu,
-                title: "AI Materials Hub",
-                desc: "Real-time pricing & vendors",
-                color: "from-orange-500 to-red-500",
-                aiFeature: "Intelligent Recommendations",
-              },
-              {
-                icon: Users,
-                title: "AI Workforce",
-                desc: "Verified contractors & labor",
-                color: "from-green-500 to-emerald-500",
-                aiFeature: "Smart Matching",
-              },
-              {
-                icon: Leaf,
-                title: "AI Vastu & Eco",
-                desc: "Sustainable & compliant",
-                color: "from-purple-500 to-pink-500",
-                aiFeature: "Compliance Analysis",
-              },
-            ].map((feature, index) => (
-              <Card
-                key={index}
-                className="group relative overflow-hidden border-0 bg-slate-800/90 dark:bg-slate-900/90 backdrop-blur-md hover:bg-slate-700/90 dark:hover:bg-slate-800/90 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/25"
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
-                />
-                <CardContent className="pt-8 pb-6 text-center relative z-10">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 dark:bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 group-hover:rotate-12">
-                    <feature.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="font-bold text-white text-lg mb-2">{feature.title}</h3>
-                  <p className="text-slate-300 dark:text-slate-400 text-sm mb-3">{feature.desc}</p>
-                  <Badge className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-200 border-blue-400/30 text-xs">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    {feature.aiFeature}
-                  </Badge>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Authentication Section */}
-          <div id="get-started" className="max-w-md mx-auto">
-            <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-0 shadow-2xl">
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl font-bold text-slate-800 dark:text-white">Get Started</CardTitle>
-                <CardDescription className="text-slate-600 dark:text-slate-400">
-                  Join thousands of builders using AI
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Tabs defaultValue="login" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-6">
-                    <TabsTrigger value="login">Login</TabsTrigger>
-                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                  </TabsList>
-                  {error && <div className="text-sm text-red-600 text-center">{error}</div>}
-
-                  <TabsContent value="login" className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
-                        Email
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password" className="text-slate-700 dark:text-slate-300">
-                        Password
-                      </Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
-                      />
-                    </div>
-                    <Button
-                      onClick={handleLogin}
-                      disabled={loading}
-                      className="w-full !bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      {loading ? 'Signing in...' : (
-                        <>
-                          Login to EasyConstruct
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </>
-                      )}
-                    </Button>
-                  </TabsContent>
-
-                  <TabsContent value="signup" className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-slate-700 dark:text-slate-300">
-                        Full Name
-                      </Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Enter your full name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email" className="text-slate-700 dark:text-slate-300">
-                        Email
-                      </Label>
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password" className="text-slate-700 dark:text-slate-300">
-                        Password
-                      </Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Create a password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
-                      />
-                    </div>
-                    <Button
-                      onClick={handleSignup}
-                      disabled={loading}
-                      className="w-full !bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      {loading ? 'Creating account...' : (
-                        <>
-                          Create Account
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </>
-                      )}
-                    </Button>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-16">
-            <div className="flex flex-wrap justify-center gap-4 mb-6">
-              {[
-                {
-                  icon: Shield,
-                  text: "AI-Verified Platform",
-                  color: "bg-green-600/80 text-green-50 border-green-500/50",
-                },
-                { icon: Bot, text: "100% AI-Powered", color: "bg-blue-600/80 text-blue-50 border-blue-500/50" },
-                { icon: Users, text: "Trusted Users", color: "bg-purple-600/80 text-purple-50 border-purple-500/50" },
-                {
-                  icon: Award,
-                  text: "AI Industry Leader",
-                  color: "bg-yellow-600/80 text-yellow-50 border-yellow-500/50",
-                },
-                { icon: Globe, text: "Pan-India AI", color: "bg-cyan-600/80 text-cyan-50 border-cyan-500/50" },
-              ].map((badge, index) => (
-                <Badge
-                  key={index}
-                  className={`gap-2 px-4 py-2 ${badge.color} hover:scale-105 transition-transform duration-300 animate-pulse`}
-                  style={{ animationDelay: `${index * 0.2}s` }}
-                >
-                  <badge.icon className="h-4 w-4" />
-                  {badge.text}
-                </Badge>
-              ))}
-            </div>
-            <p className="text-slate-800 dark:text-slate-200 text-lg font-medium">
-              AI-powered construction across Mangalore, Mumbai, Delhi, Bangalore, Chennai & 200+ cities
-            </p>
-            <div className="mt-8 flex justify-center">
-              <footer className="w-full text-center mt-4">
-                <div className="text-sm text-slate-200 dark:text-slate-400">
-                  © {new Date().getFullYear()} EasyConstruct — Team GA11
-                </div>
-              </footer>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  )
-}
-
-// It's better practice to define types/interfaces outside the component
 interface CityData {
   name: string
   multiplier: number
   avgCost: number
 }
+
 interface StateData {
   districts: string[]
   cities: CityData[]
 }
+
 interface IndianStatesDistricts {
   [key: string]: StateData
 }
 
-function BudgetInputScreen() {
+interface BudgetInputScreenProps {
+  onBack?: (data?: { budget: string; area: string; rooms: string }) => void
+  onDetailedData?: (data: {
+    budget: string
+    sqft: string
+    bedrooms: string
+    bathrooms: string
+    state: string
+    city: string
+    constructionType: string
+    qualityLevel: string
+    floors: string
+    plotSize: string
+    hasKitchen: boolean
+    hasBalcony: boolean
+    hasGarden: boolean
+  }) => void
+}
+
+export default function BudgetInputScreen({ onBack, onDetailedData }: BudgetInputScreenProps) {
   const [budget, setBudget] = useState("")
   const [sqft, setSqft] = useState("")
   const [bedrooms, setBedrooms] = useState("")
@@ -432,14 +58,12 @@ function BudgetInputScreen() {
   const [constructionType, setConstructionType] = useState("")
   const [qualityLevel, setQualityLevel] = useState("")
   const [floors, setFloors] = useState("")
-  const [plotSize, setPlotSize] = useState("") // plot size in sqft as string
+  const [plotSize, setPlotSize] = useState("")
 
-  // add: compute numeric sqft and convert to cents (1 cent ≈ 435.6 sqft)
   const plotSizeSqft = parseFloat(plotSize) || 0
   const plotSizeCents = plotSizeSqft ? +(plotSizeSqft / 435.6).toFixed(2) : 0
 
   const [showAnalysis, setShowAnalysis] = useState(false)
-  const [showDashboard, setShowDashboard] = useState(false)
 
   const indianStatesDistricts: IndianStatesDistricts = {
     "Andhra Pradesh": {
@@ -1483,11 +1107,31 @@ function BudgetInputScreen() {
   }
 
   const handleProceedToDashboard = () => {
-    setShowDashboard(true)
-  }
-
-  if (showDashboard) {
-    return <ConstructionDashboard />
+    if (onDetailedData) {
+      onDetailedData({
+        budget,
+        sqft,
+        bedrooms,
+        bathrooms,
+        state,
+        city,
+        constructionType,
+        qualityLevel,
+        floors,
+        plotSize,
+        hasKitchen,
+        hasBalcony,
+        hasGarden,
+      })
+    }
+    if (onBack) {
+      const budgetInfo = {
+        budget: `₹${Number.parseInt(budget || "0").toLocaleString()}`,
+        area: `${sqft} sq ft`,
+        rooms: `${bedrooms} BHK`,
+      }
+      onBack(budgetInfo)
+    }
   }
 
   const selectedCityData = availableCities.find((c) => c.name === city)
@@ -1875,261 +1519,6 @@ function BudgetInputScreen() {
           )}
         </div>
       </div>
-    </div>
-  )
-}
-
-function ConstructionDashboard() {
-  const [currentView, setCurrentView] = useState("dashboard")
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (currentView === "ai-designer") {
-    return <AIHouseDesigner onBack={() => setCurrentView("dashboard")} />
-  }
-
-  if (currentView === "materials") {
-    return <MaterialsDirectory onBack={() => setCurrentView("dashboard")} />
-  }
-
-  if (currentView === "workforce") {
-    return <WorkforceDirectory onBack={() => setCurrentView("dashboard")} />
-  }
-
-  if (currentView === "vastu") {
-    return <VastuEcoCompliance onBack={() => setCurrentView("dashboard")} />
-  }
-
-  // new: diy view branch
-  if (currentView === "diy") {
-    return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b bg-card/95 backdrop-blur-md sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
-                <Building2 className="h-5 w-5" />
-              </div>
-              <span className="font-semibold">EasyConstruct — DIY Projects</span>
-            </div>
-            {mounted && (
-              <Button variant="outline" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-            )}
-          </div>
-        </header>
-
-        <main className="container mx-auto px-4 py-8">
-          <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className="mb-4">
-            ← Back to Dashboard
-          </Button>
-
-          {/* DIY Universe - integrated DIY projects finder with AI search */}
-          <DIYUniverse />
-        </main>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card/95 backdrop-blur-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
-                <Building2 className="h-5 w-5" />
-              </div>
-              <span className="font-semibold">EasyConstruct</span>
-            </div>
-
-            <nav className="flex items-center gap-2">
-              <Button
-                variant={currentView === "dashboard" ? "default" : "ghost"}
-                onClick={() => setCurrentView("dashboard")}
-                className="gap-2"
-              >
-                <Home className="h-4 w-4" />
-                Dashboard
-              </Button>
-              <Button
-                variant={currentView === "ai-designer" ? "default" : "ghost"}
-                onClick={() => setCurrentView("ai-designer")}
-                className="gap-2"
-              >
-                <Bot className="h-4 w-4" />
-                AI Designer
-              </Button>
-              <Button
-                variant={currentView === "materials" ? "default" : "ghost"}
-                onClick={() => setCurrentView("materials")}
-                className="gap-2"
-              >
-                <Cpu className="h-4 w-4" />
-                AI Materials
-              </Button>
-              <Button
-                variant={currentView === "workforce" ? "default" : "ghost"}
-                onClick={() => setCurrentView("workforce")}
-                className="gap-2"
-              >
-                <Users className="h-4 w-4" />
-                AI Workforce
-              </Button>
-              <Button
-                variant={currentView === "vastu" ? "default" : "ghost"}
-                onClick={() => setCurrentView("vastu")}
-                className="gap-2"
-              >
-                <Leaf className="h-4 w-4" />
-                AI Vastu & Eco
-              </Button>
-
-              {/* new nav button to open the DIY mini-app */}
-              <Button
-                variant={currentView === "diy" ? "default" : "ghost"}
-                onClick={() => setCurrentView("diy")}
-                className="gap-2"
-              >
-                <Star className="h-4 w-4" />
-                DIY Projects
-              </Button>
-            </nav>
-
-            {mounted && (
-              <Button variant="outline" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Dashboard Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-balance mb-2">Welcome to Your Construction Hub</h2>
-          <p className="text-muted-foreground">Your central place to manage and visualize your project.</p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Quick Actions */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Get started with these essential features</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-4">
-                <Button
-                  className="h-20 flex-col gap-2 bg-transparent"
-                  variant="outline"
-                  onClick={() => setCurrentView("ai-designer")}
-                >
-                  <Palette className="h-6 w-6" />
-                  <span>AI House Designer</span>
-                </Button>
-                <Button
-                  className="h-20 flex-col gap-2 bg-transparent"
-                  variant="outline"
-                  onClick={() => setCurrentView("materials")}
-                >
-                  <Hammer className="h-6 w-6" />
-                  <span>Browse Materials</span>
-                </Button>
-                <Button
-                  className="h-20 flex-col gap-2 bg-transparent"
-                  variant="outline"
-                  onClick={() => setCurrentView("workforce")}
-                >
-                  <Users className="h-6 w-6" />
-                  <span>Find Workforce</span>
-                </Button>
-                <Button
-                  className="h-20 flex-col gap-2 bg-transparent"
-                  variant="outline"
-                  onClick={() => setCurrentView("vastu")}
-                >
-                  <Leaf className="h-6 w-6" />
-                  <span>Vastu & Eco Guide</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Project Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Budget</span>
-                <span className="font-semibold">₹25,00,000</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Area</span>
-                <span className="font-semibold">1,200 sq ft</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Rooms</span>
-                <span className="font-semibold">3 BHK</span>
-              </div>
-              <div className="pt-4">
-                <Button className="w-full">View Detailed Plan</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Feature Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="font-semibold mb-2">Real-time Pricing</h3>
-              <p className="text-sm text-muted-foreground">Get live material costs across 200+ Indian cities</p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-6 w-6 text-secondary" />
-              </div>
-              <h3 className="font-semibold mb-2">Verified Vendors</h3>
-              <p className="text-sm text-muted-foreground">Connect with trusted suppliers and contractors</p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Home className="h-6 w-6 text-accent" />
-              </div>
-              <h3 className="font-semibold mb-2">3D Visualization</h3>
-              <p className="text-sm text-muted-foreground">See your home in AR/VR before construction</p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Leaf className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="font-semibold mb-2">Eco-Friendly</h3>
-              <p className="text-sm text-muted-foreground">Sustainable materials and green certifications</p>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
     </div>
   )
 }

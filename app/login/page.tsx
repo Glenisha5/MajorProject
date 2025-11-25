@@ -29,8 +29,8 @@ export default function LoginPage() {
       if (!res.ok) {
         setError(data?.error || 'Login failed')
       } else {
-        // cookie set by server; redirect to landing or dashboard
-        router.push('/')
+        // cookie set by server; redirect to dashboard
+        router.push('/dashboard')
       }
     } catch (err) {
       setError('Network error')

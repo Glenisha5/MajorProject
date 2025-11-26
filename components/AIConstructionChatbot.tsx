@@ -336,8 +336,8 @@ export default function AIConstructionChatbot() {
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 px-4">
-              <div className="space-y-4 py-4">
+            <ScrollArea className="flex-1 px-4 overflow-hidden">
+              <div className="space-y-4 py-4 h-full overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
                 {messages.map((message) => (
                   <div key={message.id} className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}>
                     <div
@@ -350,7 +350,7 @@ export default function AIConstructionChatbot() {
                       <div className="flex items-start gap-2">
                         {message.type === "ai" && <Sparkles className="h-3 w-3 mt-0.5 flex-shrink-0" />}
                         <div className="flex-1">
-                          <p>{message.content}</p>
+                          <p className="whitespace-pre-wrap break-words">{message.content}</p>
                           <div className="flex items-center justify-between mt-1">
                             <span className="text-xs opacity-70">
                               {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}

@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
 import {
   ArrowLeft,
   Compass,
@@ -36,6 +38,9 @@ export default function VastuEcoCompliance({ onBack }: VastuEcoComplianceProps) 
   const [selectedRoom, setSelectedRoom] = useState("entrance")
   const [houseOrientation, setHouseOrientation] = useState("north")
   const [ecoFeatures, setEcoFeatures] = useState<string[]>([])
+  const { toast } = useToast()
+  const [applying, setApplying] = useState(false)
+  const [applied, setApplied] = useState(false)
 
   const vastuRules = {
     entrance: {
@@ -388,11 +393,61 @@ export default function VastuEcoCompliance({ onBack }: VastuEcoComplianceProps) 
 
         {/* Action Buttons */}
         <div className="flex gap-4 mt-8">
-          <Button className="flex-1">
+          <Button
+            className="flex-1"
+            onClick={async () => {
+              try {
+                setApplying(true)
+                // Simulate applying recommendations (e.g., merge into design)
+                await new Promise((res) => setTimeout(res, 600))
+                setApplied(true)
+                toast({ title: "Applied", description: "Recommendations successfully applied to design." })
+              } catch (e) {
+                toast({ title: "Error", description: "Failed to apply recommendations." })
+              } finally {
+                setApplying(false)
+              }
+            }}
+            disabled={applying || applied}
+          >
             <Star className="h-4 w-4 mr-2" />
-            Apply Recommendations to Design
+            {applied ? "Applied" : applying ? "Applying..." : "Apply Recommendations to Design"}
           </Button>
-          <Button variant="outline" className="flex-1 bg-transparent">
+
+          <Button
+            variant="outline"
+            className="flex-1 bg-transparent"
+            onClick={() => {
+              try {
+                const report = {
+                  generatedAt: new Date().toISOString(),
+                  houseOrientation,
+                  vastuOverallScore: calculateOverallVastuScore(),
+                  ecoScore: Math.round(calculateEcoScore()),
+                  ecoFeaturesSelected: ecoFeatures,
+                  vastuRecommendations: vastuRules,
+                  summary: {
+                    message: "This is a dummy compliance report generated for preview."
+                  },
+                }
+
+                const dataStr = JSON.stringify(report, null, 2)
+                const blob = new Blob([dataStr], { type: "application/json" })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement("a")
+                a.href = url
+                a.download = `compliance-report-${new Date().toISOString().slice(0,19)}.json`
+                document.body.appendChild(a)
+                a.click()
+                a.remove()
+                URL.revokeObjectURL(url)
+
+                toast({ title: "Report generated", description: "Compliance report downloaded (dummy)." })
+              } catch (err) {
+                toast({ title: "Error", description: "Failed to generate report." })
+              }
+            }}
+          >
             <Home className="h-4 w-4 mr-2" />
             Generate Compliance Report
           </Button>
@@ -402,13 +457,3 @@ export default function VastuEcoCompliance({ onBack }: VastuEcoComplianceProps) 
   )
 }
 
-function Label({ children, className, ...props }: { children: React.ReactNode; className?: string }) {
-  return (
-    <label
-      className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className || ""}`}
-      {...props}
-    >
-      {children}
-    </label>
-  )
-}

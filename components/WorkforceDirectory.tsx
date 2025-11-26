@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,6 +33,7 @@ interface WorkforceDirectoryProps {
 }
 
 export default function WorkforceDirectory({ onBack }: WorkforceDirectoryProps) {
+  const { toast } = useToast()
   const [selectedCategory, setSelectedCategory] = useState("contractors")
   const [selectedCity, setSelectedCity] = useState("Mumbai")
   const [experienceFilter, setExperienceFilter] = useState("all")
@@ -421,7 +423,20 @@ export default function WorkforceDirectory({ onBack }: WorkforceDirectoryProps) 
                             Book Now
                           </Button>
                           <div className="grid grid-cols-2 gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                try {
+                                  // Attempt to start a phone call (mobile/softphone)
+                                  window.location.href = "tel:+917306100556"
+                                } catch (e) {
+                                  // fallback: open tel link
+                                  window.open("tel:+917306100556")
+                                }
+                                toast({ title: "Dialing", description: "Dialing +91 73061 00556 (dummy)" })
+                              }}
+                            >
                               <Phone className="h-4 w-4 mr-1" />
                               Call
                             </Button>
@@ -617,7 +632,18 @@ export default function WorkforceDirectory({ onBack }: WorkforceDirectoryProps) 
                 <Button variant="outline" onClick={() => setSelectedProfessional(null)} className="flex-1">
                   Cancel
                 </Button>
-                <Button className="flex-1">
+                <Button
+                  className="flex-1"
+                  onClick={() => {
+                    // Close modal
+                    setSelectedProfessional(null)
+                    // Show success toast
+                    toast({
+                      title: "Booked successfully",
+                      description: `You have booked ${selectedProfessional.name}. The professional will contact you soon.`,
+                    })
+                  }}
+                >
                   <Calendar className="h-4 w-4 mr-2" />
                   Confirm Booking
                 </Button>

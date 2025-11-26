@@ -6,6 +6,8 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import AIConstructionChatbot from "@/components/AIConstructionChatbot"
+import { Toaster } from "@/components/ui/toaster"
+import CartButton from "@/components/CartButton"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
@@ -27,6 +29,8 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
             {children}
             <AIConstructionChatbot />
+            <Toaster />
+            <CartButton />
           </ThemeProvider>
           <Analytics />
         </Suspense>

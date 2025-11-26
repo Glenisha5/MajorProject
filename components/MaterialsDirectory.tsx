@@ -34,6 +34,8 @@ import {
   Lightbulb,
   Shield,
 } from "lucide-react"
+import useCart from "@/hooks/use-cart"
+import { useToast } from "@/hooks/use-toast"
 
 interface MaterialsDirectoryProps {
   onBack: () => void
@@ -49,6 +51,8 @@ export default function MaterialsDirectory({ onBack }: MaterialsDirectoryProps) 
   const [aiRecommendations, setAiRecommendations] = useState<any[]>([])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [aiInsights, setAiInsights] = useState<any>(null)
+  const { add } = useCart()
+  const { toast } = useToast()
 
   useEffect(() => {
     generateAIRecommendations()
@@ -695,16 +699,51 @@ export default function MaterialsDirectory({ onBack }: MaterialsDirectoryProps) 
                         </div>
 
                         <div className="flex flex-col gap-2">
-                          <Button size="sm" disabled={!material.inStock} className="w-full">
+                          <Button
+                            size="sm"
+                            disabled={!material.inStock}
+                            className="w-full"
+                            onClick={() => {
+                              const price = getAdjustedPrice(material.basePrice)
+                              add(
+                                {
+                                  id: material.id,
+                                  name: material.name,
+                                  price: price,
+                                  unit: material.unit,
+                                },
+                                1
+                              )
+                              toast({ title: "Added to cart", description: `${material.name} added to cart.` })
+                            }}
+                          >
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Smart Add to Cart
                           </Button>
                           <div className="grid grid-cols-2 gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                toast({
+                                  title: "Call",
+                                  description: `Calling ${material.vendor} (dummy).`,
+                                })
+                              }
+                            >
                               <Phone className="h-4 w-4 mr-1" />
                               Call
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                toast({
+                                  title: "Directions",
+                                  description: `Directions to ${material.vendor}: ${material.distance} (dummy).`,
+                                })
+                              }
+                            >
                               <Navigation className="h-4 w-4 mr-1" />
                               Directions
                             </Button>

@@ -5,7 +5,8 @@ flask-cors==4.0.0
 # LangChain and Groq for AI chat
 langchain-groq==0.1.9
 langchain==0.3.1
-langchain-core==0.3.6
+# removed explicit langchain-core pin (caused dependency resolution conflicts with langchain-groq)
+# let `langchain` / pip choose a compatible `langchain-core` version
 
 # Environment variable management
 python-dotenv==1.0.0

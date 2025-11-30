@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MajorProject — Fix & Deployment Report</title>
+  <style>
+    body{font-family:Georgia, 'Times New Roman', serif;line-height:1.5;color:#111;padding:32px;max-width:900px;margin:auto}
+    h1,h2{color:#1a4b7a}
+    code{background:#f3f3f3;padding:2px 6px;border-radius:4px}
+    pre{background:#f8f8f8;padding:12px;border-left:4px solid #ddd;overflow:auto}
+    .meta{font-size:0.95rem;color:#444}
+    .file-list{margin-left:0;padding-left:0;list-style:none}
+    .file-list li{padding:2px 0}
+    .note{background:#fffbe6;border-left:4px solid #ffd966;padding:10px;margin:12px 0}
+  </style>
+</head>
+<body>
+  <h1>MajorProject — Fix & Deployment Report</h1>
+  <p class="meta">Generated: Nov 26, 2025</p>
+
+  <h2>Summary</h2>
+  <p>This report documents the troubleshooting and fixes applied to the <code>MajorProject</code> repository to resolve local dev-server errors and a Vercel Python dependency conflict. The workspace is located at <code>C:\Users\HP\OneDrive\Dokumen\MajorProject</code>.</p>
+
+  <h2>Problems Observed</h2>
+  <ul>
+    <li><strong>Next.js dev server failure</strong> — repeated error: <code>EINVAL: invalid argument, readlink '.next/server/*.json'</code> (examples: <code>app-paths-manifest.json</code>, <code>middleware-manifest.json</code>). This was caused by stale build artifacts in the <code>.next</code> directory (and sometimes interference from OneDrive).</li>
+    <li><strong>TypeScript editor diagnostics</strong> in the nested frontend (<code>ai-house-project/frontend</code>) complaining about missing type definitions (e.g. <code>vite/client</code>), and later many "Cannot find type definition file for '...'").</li>
+    <li><strong>Vercel build failure (Python)</strong> — pip failed with <code>ResolutionImpossible</code> because <code>langchain-groq==0.1.9</code> required <code>langchain-core &lt; 0.3.0</code> but the repo previously pinned <code>langchain-core==0.3.6</code> (conflicting).</li>
+  </ul>
+
+  <h2>Actions Taken</h2>
+  <ol>
+    <li>Inspected and removed stale Next.js build artifacts:
+      <pre>rm -rf .next</pre>
+      Restarted the Next dev server with <code>npm run dev</code>. Next recreated the build artifacts and dev server started successfully at <code>http://localhost:3000</code>.
+    </li>
+
+    <li>Frontend TypeScript fixes in <code>ai-house-project/frontend/tsconfig.json</code>:
+      <ul>
+        <li>Added safe compiler options: <code>baseUrl</code>, <code>paths</code>, <code>isolatedModules</code>, and <code>forceConsistentCasingInFileNames</code>.</li>
+        <li>Removed the explicit <code>types: ["vite/client"]</code> entry because the VSCode TS server in a monorepo sometimes resolves types from the wrong <code>node_modules</code>.</li>
+        <li>Added a lightweight ambient declaration file <code>ai-house-project/frontend/src/env.d.ts</code> to define <code>import.meta.env</code> so code depending on it stops showing errors.</li>
+        <li>Restricted <code>typeRoots</code> to <code>./node_modules/@types</code> to avoid TypeScript treating all package folders as ambient libraries (this removed many "Cannot find type definition file for '...'" errors).</li>
+      </ul>
+    </li>
+
+    <li>Added a small cleanup script to help prevent dev errors on restart:
+      <ul>
+        <li><code>scripts/clean-next.js</code> — removes top-level <code>.next</code> and <code>ai-house-project/.next</code> if present.</li>
+        <li>An earlier attempt to add a <code>predev</code> script to run the cleaner before <code>npm run dev</code> was prepared; you can enable it if desired by updating <code>package.json</code>.</li>
+      </ul>
+    </li>
+
+    <li>Fixed Vercel Python dependency conflict in <code>requirements.txt</code>:
+      <ul>
+        <li>Removed the explicit problematic pin of <code>langchain-core==0.3.6</code>.</li>
+        <li>Pinned <code>langchain==0.2.36</code>, which is compatible with <code>langchain-groq==0.1.9</code> (this allows pip to resolve a <code>langchain-core</code> &lt; 0.3.0 during install).</li>
+        <li>Committed and pushed these changes to <code>origin/main</code> and triggered a redeploy on Vercel.</li>
+      </ul>
+    </li>
+
+    <li>Committed all local fixes. Key commits (examples):
+      <pre>chore: tsconfig fixes, add env.d.ts and clean-next script
+fix(requirements): remove explicit langchain-core pin to resolve dependency conflicts
+fix(requirements): pin langchain 0.2.36 to satisfy langchain-groq dependency
+chore(ci): trigger Vercel redeploy after requirements fix</pre>
+    </li>
+
+    <li>Pushed to remote <code>origin</code> (URL: <code>https://github.com/Glenisha5/MajorProject.git</code>) and verified the push succeeded.</li>
+  </ol>
+
+  <h2>Files Added / Modified</h2>
+  <ul class="file-list">
+    <li><code>ai-house-project/frontend/tsconfig.json</code> — updated compilerOptions</li>
+    <li><code>ai-house-project/frontend/src/env.d.ts</code> — added ambient types for <code>import.meta.env</code></li>
+    <li><code>scripts/clean-next.js</code> — cleanup helper</li>
+    <li><code>requirements.txt</code> — removed conflicting pin and pinned <code>langchain==0.2.36</code></li>
+  </ul>
+
+  <h2>Deployment / Verification</h2>
+  <p>An empty commit was pushed to trigger a Vercel redeploy after the requirements fix. To monitor the redeploy:</p>
+  <ol>
+    <li>Open the Vercel dashboard → Projects → select the project.</li>
+    <li>Open the latest Deployment and inspect the build logs, watch the Python install step to ensure pip resolves dependencies successfully.</li>
+  </ol>
+
+  <h2>Recommendations & Notes</h2>
+  <ul>
+    <li><strong>OneDrive interference:</strong> Storing active repos on OneDrive can sometimes corrupt or change file metadata and cause fs operations (like <code>readlink</code>) to fail. If issues recur, consider moving the repo out of OneDrive or excluding the repo from sync.</li>
+    <li><strong>Submodule warning:</strong> Git warned about embedded repos (e.g., <code>public/AR_VR</code>). If you didn't intend submodules, remove them from the index with <code>git rm --cached &lt;path&gt;</code> and commit the removal.</li>
+    <li><strong>Convert HTML to PDF:</strong> The file you're currently viewing is an HTML report. To get a PDF, open this file in a browser and choose Print → Save as PDF (or use a headless tool such as puppeteer to programmatically render it to PDF).</li>
+  </ul>
+
+  <h2>How to produce a PDF (two options)</h2>
+  <h3>Manual (recommended)</h3>
+  <ol>
+    <li>Open <code>MAJORPROJECT_REPORT.html</code> in Chrome/Edge/Firefox.</li>
+    <li>Press <code>Ctrl+P</code> (Windows) → Destination: <em>Save as PDF</em> → Save.</li>
+  </ol>
+
+  <h3>Programmatic (using Node + Puppeteer)</h3>
+  <p>From the repo root (requires Node and network access to install puppeteer):</p>
+  <pre>npm install puppeteer --no-save
+node -e "(async()=>{const puppeteer=require('puppeteer');const b=await puppeteer.launch();const p=await b.newPage();await p.goto('file:'+process.cwd()+'/MAJORPROJECT_REPORT.html');await p.pdf({path:'MAJORPROJECT_REPORT.pdf',format:'A4'});await b.close();console.log('PDF written: MAJORPROJECT_REPORT.pdf')})()</pre>
+
+  <h2>If you want me to produce the PDF for you</h2>
+  <p>Reply with <strong>"generate pdf"</strong> and I will attempt to run the Puppeteer command here and add <code>MAJORPROJECT_REPORT.pdf</code> to the repo (if the environment supports it).</p>
+
+  <h2>Questions / Next steps</h2>
+  <ul>
+    <li>Would you like me to run the Puppeteer conversion now to create the PDF inside the repo?</li>
+    <li>Do you want me to add the <code>predev</code> script to <code>package.json</code> so <code>npm run dev</code> always cleans <code>.next</code> first?</li>
+  </ul>
+
+  <p class="note">If you want the PDF generated now, reply with <strong>"generate pdf"</strong>. If you prefer to print locally, open the HTML file and save as PDF from your browser.</p>
+</body>
+</html>

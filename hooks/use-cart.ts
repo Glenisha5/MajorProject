@@ -77,7 +77,13 @@ export function getCartCount() {
 }
 
 export default function useCart() {
-  const [items, setItems] = useState<CartItem[]>(() => readItems())
+  // Start with an empty cart on the first render so server and client markup
+  // stay consistent. Populate from localStorage after mount.
+  const [items, setItems] = useState<CartItem[]>([])
+
+  useEffect(() => {
+    setItems(readItems())
+  }, [])
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
